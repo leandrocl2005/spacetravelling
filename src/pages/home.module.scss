@@ -1,1 +1,29 @@
-// TODO
+.postContainer {
+  width: 100%;
+  margin-bottom: 50px;
+  padding: 0 20%;
+
+  h2 {
+    font-size: 34px;
+    cursor: pointer;
+  }
+
+  h3 {
+    font-size: 18px;
+    line-height: 22px;
+    font-weight: 400;
+    color: #f7f7f7;
+    margin-top: 8px;
+  }
+}
+
+.loadPosts {
+  color: #ff57b2;
+  font-family: 'Inter', sans-serif;
+  background: inherit;
+  border: none;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  margin-left: 20%;
+}

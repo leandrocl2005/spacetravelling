@@ -1,1 +1,21 @@
-// TODO
+.dateUserContainer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  p {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #bbbbbb;
+
+    span {
+      margin-left: 14px;
+    }
+  }
+
+  p + p {
+    margin-left: 32px;
+  }
+}

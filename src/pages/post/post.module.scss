@@ -1,1 +1,48 @@
-// TODO
+.bannerContainer {
+  height: 400px;
+  width: 100%;
+
+  img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+}
+
+.postContainer {
+  padding: 0 20%;
+  margin-top: 32px;
+
+  h1 {
+    font-size: 48px;
+    line-height: 58px;
+    font-weight: 600;
+    color: #f8f8f8;
+  }
+
+  h2 {
+    margin-top: 64px;
+    font-size: 28px;
+    font-weight: 36px;
+    color: #d7d7d7;
+  }
+
+  .bodyContainer {
+    p {
+      margin: 8px 0;
+    }
+
+    p:first-child {
+      margin-top: 16px;
+    }
+  }
+}
+
+.loading {
+  color: #ff57b2;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  margin-left: 20%;
+}
