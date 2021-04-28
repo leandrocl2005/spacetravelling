@@ -46,3 +46,30 @@
   line-height: 22px;
   margin-left: 20%;
 }
+
+.prevNext {
+  display: flex;
+  justify-content: space-between;
+
+  p {
+    font-family: Inter;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
+    letter-spacing: -0.5px;
+    text-align: left;
+  }
+
+  a {
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 19px;
+    letter-spacing: -0.5px;
+    text-align: left;
+    text-decoration: none;
+    color: #ff57b2;
+  }
+}

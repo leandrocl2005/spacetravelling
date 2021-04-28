@@ -5,6 +5,7 @@ import { ptBR } from 'date-fns/locale';
 import { useCallback, useState } from 'react';
 import Link from 'next/link';
 
+import { GetStaticProps } from 'next';
 import Header from '../components/Header';
 
 import { getPrismicClient } from '../services/prismic';
@@ -39,13 +40,18 @@ interface StaticProps {
   props: {
     postsPagination: PostPagination;
   };
+  preview: boolean;
 }
 
 interface HomeProps {
   postsPagination: PostPagination;
+  preview: boolean;
 }
 
-export default function Home({ postsPagination }: HomeProps): JSX.Element {
+export default function Home({
+  postsPagination,
+  preview,
+}: HomeProps): JSX.Element {
   const [posts, setPosts] = useState<Post[]>(() => postsPagination.results);
   const [nextPage, setNextPage] = useState<string | null>(
     () => postsPagination.next_page
@@ -105,11 +111,22 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
           </button>
         )}
       </main>
+
+      {preview && (
+        <div className={commonStyles.previewModeButton}>
+          <Link href="/api/exit-preview">
+            <a>Sair do modo Preview</a>
+          </Link>
+        </div>
+      )}
     </>
   );
 }
 
-export const getStaticProps = async (): Promise<StaticProps> => {
+export const getStaticProps: GetStaticProps<HomeProps> = async ({
+  preview = false,
+  previewData,
+}) => {
   const prismic = getPrismicClient();
 
   const response = await prismic.query(
@@ -117,6 +134,7 @@ export const getStaticProps = async (): Promise<StaticProps> => {
     {
       fetch: ['posts.title', 'posts.subtitle', 'posts.author'],
       pageSize: 2,
+      ref: previewData?.ref ?? null,
     }
   );
 
@@ -139,6 +157,7 @@ export const getStaticProps = async (): Promise<StaticProps> => {
         next_page: response.next_page,
         results: formattedPosts,
       },
+      preview,
     },
   };
 };

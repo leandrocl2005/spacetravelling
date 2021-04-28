@@ -7,11 +7,13 @@ import { RiCalendarLine, RiTimerLine, RiUserLine } from 'react-icons/ri';
 import { RichText } from 'prismic-dom';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
+import Link from 'next/link';
 import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
 import Header from '../../components/Header';
+import { Comments } from '../../components/Comments';
 
 export function formatDate(date: string | Date): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
@@ -23,6 +25,8 @@ export function formatDate(date: string | Date): string {
 
 interface Post {
   first_publication_date: string | null;
+  last_publication_date: string | null;
+  uid?: string;
   data: {
     title: string;
     banner: {
@@ -40,9 +44,17 @@ interface Post {
 
 interface PostProps {
   post: Post;
+  prevPost: Post;
+  nextPost: Post;
+  preview: boolean;
 }
 
-export default function Post({ post }: PostProps): JSX.Element {
+export default function Post({
+  post,
+  prevPost,
+  nextPost,
+  preview,
+}: PostProps): JSX.Element {
   const router = useRouter();
 
   const timeToRead = useMemo(() => {
@@ -82,6 +94,11 @@ export default function Post({ post }: PostProps): JSX.Element {
             <RiTimerLine /> <span>{timeToRead} min</span>
           </p>
         </div>
+        {post.last_publication_date && (
+          <div className={commonStyles.editedDate}>
+            * editado em {formatDate(post.last_publication_date)}
+          </div>
+        )}
 
         {post.data.content.map(content => (
           <div key={content.heading}>
@@ -95,6 +112,53 @@ export default function Post({ post }: PostProps): JSX.Element {
             />
           </div>
         ))}
+
+        <hr
+          style={{
+            color: '#d7d7d7',
+            backgroundColor: '#d7d7d7',
+            height: '1px',
+            opacity: 0.1,
+            marginTop: '60px',
+            marginBottom: '48px',
+          }}
+        />
+
+        <footer>
+          <div className={styles.prevNext}>
+            <div>
+              {prevPost && (
+                <>
+                  <p>{prevPost.data.title}</p>
+                  <Link href={`/post/${prevPost.uid}`}>
+                    <a>Post anterior</a>
+                  </Link>
+                </>
+              )}
+            </div>
+
+            <div>
+              {nextPost && (
+                <>
+                  <p>{nextPost.data.title}</p>
+                  <Link href={`/post/${nextPost.uid}`}>
+                    <a>Próximo post</a>
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+
+          <Comments />
+
+          {preview && (
+            <div className={commonStyles.previewModeButton}>
+              <Link href="/api/exit-preview">
+                <a>Sair do modo Preview</a>
+              </Link>
+            </div>
+          )}
+        </footer>
       </div>
     </>
   );
@@ -114,13 +178,42 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-export const getStaticProps: GetStaticProps = async context => {
-  const { slug } = context.params;
+export const getStaticProps: GetStaticProps<PostProps> = async ({
+  params,
+  preview = false,
+  previewData,
+}) => {
+  const { slug } = params;
 
   const prismic = getPrismicClient();
-  const response = await prismic.getByUID('posts', String(slug), {});
+  const response = await prismic.getByUID('posts', String(slug), {
+    ref: previewData?.ref ?? null,
+  });
+
+  const prevPost = (
+    await prismic.query(Prismic.predicates.at('document.type', 'posts'), {
+      fetch: ['posts.title'],
+      pageSize: 1,
+      after: `${response.id}`,
+      orderings: '[document.first_publication_date desc]',
+    })
+  ).results[0];
+
+  const nextPost = (
+    await prismic.query(Prismic.predicates.at('document.type', 'posts'), {
+      fetch: ['posts.title'],
+      pageSize: 1,
+      after: `${response.id}`,
+      orderings: '[document.first_publication_date]',
+    })
+  ).results[0];
 
   return {
-    props: { post: response },
+    props: {
+      post: response,
+      prevPost: prevPost ?? null,
+      nextPost: nextPost ?? null,
+      preview,
+    },
   };
 };
